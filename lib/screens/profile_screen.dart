@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tripsync/screens/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -18,17 +19,22 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/profile_placeholder.png'), // Add your image
+              backgroundImage: user?.photoURL != null
+                  ? NetworkImage(user!.photoURL!)
+                  : null,
+              child: user?.photoURL == null
+                  ? const Icon(Icons.person, size: 50)
+                  : null,
             ),
             const SizedBox(height: 16),
             Text(
-              user?.displayName ?? 'Name not set',
+              user?.displayName ?? 'Anonymous Traveler',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            Text(user?.email ?? 'Email not set'),
+            Text(user?.email ?? 'No email provided'),
             const SizedBox(height: 20),
             const Divider(),
             ListTile(
@@ -46,16 +52,20 @@ class ProfileScreen extends StatelessWidget {
             const Spacer(),
             ElevatedButton.icon(
               onPressed: () async {
+
+                await GoogleSignIn().signOut();
                 await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        (route) => false,
+                  );
+                }
               },
               icon: const Icon(Icons.logout),
               label: const Text('Logout'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: Colors.redAccent,
                 minimumSize: const Size.fromHeight(50),
               ),
             ),

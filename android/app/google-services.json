@@ -12,7 +12,12 @@
           "package_name": "com.example.tripsync"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "219537353975-htci03atnv1pm61dotksgrifi3smm379.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAngrfRA86UDV77W_Cc-Xzj99FxPPd6r2s"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219537353975-htci03atnv1pm61dotksgrifi3smm379.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "219537353975-qquepfs4uighq0le957kf615nti83gim.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tripsync"
+              }
+            }
+          ]
         }
       }
     }

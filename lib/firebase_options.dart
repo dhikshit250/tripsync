@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '219537353975',
     projectId: 'tripsync-b66b0',
     storageBucket: 'tripsync-b66b0.firebasestorage.app',
+    iosClientId: '219537353975-qquepfs4uighq0le957kf615nti83gim.apps.googleusercontent.com',
     iosBundleId: 'com.example.tripsync',
   );
 
@@ -73,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '219537353975',
     projectId: 'tripsync-b66b0',
     storageBucket: 'tripsync-b66b0.firebasestorage.app',
+    iosClientId: '219537353975-qquepfs4uighq0le957kf615nti83gim.apps.googleusercontent.com',
     iosBundleId: 'com.example.tripsync',
   );
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tripsync/screens/profile_screen.dart';
+import 'package:tripsync/widgets/trip_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,55 +11,65 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    Center(child: Text("Groups")),
-    Center(child: Text("Recent Activity")),
-    Container(), // Placeholder for FAB (Add Trip)
-    Center(child: Text("Invitations")),
-    const ProfileScreen(),
+  // Dummy data for trips - replace this with your Firestore stream later
+  final List<Map<String, String>> _trips = [
+    {
+      "destination": "Manali",
+      "dateRange": "Aug 15 - Aug 20, 2025",
+      "imageUrl": "assets/images/manali.jpg", // Add this image to your assets
+    },
+    {
+      "destination": "Goa",
+      "dateRange": "Sep 10 - Sep 13, 2025",
+      "imageUrl": "assets/images/goa.jpg", // Add this image to your assets
+    },
   ];
-
-  void _onItemTapped(int index) {
-    if (index == 2) {
-      // Add Trip Button Pressed
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Create New Trip")),
-      );
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _onItemTapped(2),
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex > 2 ? _selectedIndex : _selectedIndex,
-          onTap: _onItemTapped,
-          selectedItemColor: Colors.deepPurple,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Groups'),
-            BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Activity'),
-            BottomNavigationBarItem(icon: Icon(null), label: ''), // FAB gap
-            BottomNavigationBarItem(icon: Icon(Icons.mail), label: 'Invites'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          ],
+      appBar: AppBar(
+        title: Text(
+          'My Trips',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: _trips.length,
+        itemBuilder: (context, index) {
+          final trip = _trips[index];
+          return TripCard(
+            destination: trip['destination']!,
+            dateRange: trip['dateRange']!,
+            imageUrl: trip['imageUrl']!,
+            onTap: () {
+              // TODO: Navigate to Trip Details Screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Tapped on ${trip['destination']}")),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: Navigate to Create Trip Screen
+        },
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        foregroundColor: Colors.white,
+        tooltip: 'Create New Trip',
+        child: const Icon(Icons.add),
       ),
     );
   }

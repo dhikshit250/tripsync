@@ -12,25 +12,32 @@ class GroupScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text("My Groups")),
+      appBar: AppBar(
+        title: const Text("My Groups"),
+      ),
       body: ListView.builder(
         itemCount: groups.length,
         itemBuilder: (context, index) {
           final group = groups[index];
+
+          // Explicitly cast the map values to their correct types
+          final groupName = group['name'] as String;
+          final memberCount = group['members'] as int;
+
           return ListTile(
-            leading: const Icon(Icons.group),
-            title: Text(group['name']!),
-            subtitle: Text('${group['members']} members'),
-            trailing: const Icon(Icons.arrow_forward_ios),
+            leading: const Icon(Icons.group_work_rounded),
+            title: Text(groupName),
+            subtitle: Text('$memberCount members'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
-              // Navigate to group details screen
+              // TODO: Navigate to group details screen
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to group creation screen
+          // TODO: Navigate to group creation screen
         },
         child: const Icon(Icons.add),
       ),
