@@ -1,10 +1,12 @@
+// lib/widgets/trip_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TripCard extends StatelessWidget {
   final String destination;
   final String dateRange;
-  final String imageUrl;
+  final String imageUrl; // This will now be a network URL
   final VoidCallback onTap;
 
   const TripCard({
@@ -30,8 +32,14 @@ class TripCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
                 image: DecorationImage(
-                  image: AssetImage(imageUrl),
+                  // Use Image.network and add an error builder
+                  image: NetworkImage(imageUrl),
                   fit: BoxFit.cover,
+                  // Show a placeholder or icon if the image fails to load
+                  onError: (exception, stackTrace) {
+                    // You can replace this with a more sophisticated error widget
+                    // For now, it will just leave the container blank
+                  },
                 ),
               ),
             ),
@@ -46,8 +54,7 @@ class TripCard extends StatelessWidget {
                   stops: const [0.5, 1.0],
                   colors: [
                     Colors.transparent,
-                    // --- FIX IS HERE ---
-                    Colors.black.withAlpha((255 * 0.8).round()),
+                    Colors.black.withOpacity(0.8),
                   ],
                 ),
               ),
@@ -65,9 +72,6 @@ class TripCard extends StatelessWidget {
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      shadows: [
-                        const Shadow(blurRadius: 2.0, color: Colors.black54)
-                      ],
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -78,9 +82,9 @@ class TripCard extends StatelessWidget {
                       Text(
                         dateRange,
                         style: GoogleFonts.lato(
-                            fontSize: 14,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],

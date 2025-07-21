@@ -6,8 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tripsync/models/trip_group.dart';
 import 'package:tripsync/screens/create_group_screen.dart';
-import 'package:tripsync/screens/group_dashboard_screen.dart'; // Make sure this is imported
+import 'package:tripsync/screens/group_dashboard_screen.dart';
 import 'package:tripsync/screens/profile_screen.dart';
+import 'package:tripsync/services/image_service.dart'; // <-- NEW IMPORT
 import 'package:tripsync/widgets/trip_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final user = FirebaseAuth.instance.currentUser;
+  final ImageService _imageService = ImageService(); // Create an instance of the service
 
   @override
   Widget build(BuildContext context) {
@@ -65,19 +67,50 @@ class _HomeScreenState extends State<HomeScreen> {
             itemCount: groups.length,
             itemBuilder: (context, index) {
               final group = groups[index];
-              return TripCard(
-                destination: group.groupName,
-                dateRange: '${group.startDate.toLocal().toString().split(' ')[0]} - ${group.endDate.toLocal().toString().split(' ')[0]}',
-                imageUrl: "assets/images/goa.jpg", // Replace with dynamic or placeholder image
-                onTap: () {
-                  // --- FIX IS HERE: REPLACED SNACKBAR WITH NAVIGATOR ---
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => GroupDashboardScreen(group: group),
-                    ),
+              return FutureBuilder<String>(
+                future: _imageService.fetchImageForPlace(group.groupName), // Fetch the image
+                builder: (context, imageSnapshot) {
+                  if (imageSnapshot.connectionState == ConnectionState.waiting) {
+                    // Show a placeholder while the image loads
+                    return const Card(
+                      child: SizedBox(
+                        height: 220,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                  }
+
+                  if (imageSnapshot.hasError || !imageSnapshot.hasData) {
+                    // Show a placeholder if fetching fails
+                    return TripCard(
+                      destination: group.groupName,
+                      dateRange: '${group.startDate.toLocal().toString().split(' ')[0]} - ${group.endDate.toLocal().toString().split(' ')[0]}',
+                      imageUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1', // Default URL
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GroupDashboardScreen(group: group),
+                          ),
+                        );
+                      },
+                    );
+                  }
+
+                  // Once the image URL is fetched, build the TripCard
+                  return TripCard(
+                    destination: group.groupName,
+                    dateRange: '${group.startDate.toLocal().toString().split(' ')[0]} - ${group.endDate.toLocal().toString().split(' ')[0]}',
+                    imageUrl: imageSnapshot.data!,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GroupDashboardScreen(group: group),
+                        ),
+                      );
+                    },
                   );
-                  // --- END OF FIX ---
                 },
               );
             },
