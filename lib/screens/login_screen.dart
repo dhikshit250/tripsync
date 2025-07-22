@@ -1,5 +1,6 @@
 // lib/screens/login_screen.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart'; // <-- NEW IMPORT
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,10 +17,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // <-- NEW
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  // ... (passwordReset and signInWithEmail methods are the same)
   Future<void> _passwordReset() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
@@ -77,8 +80,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // --- UPDATED GOOGLE SIGN-IN METHOD ---
   Future<void> _signInWithGoogle() async {
-    // This uses the version 6.x.x syntax that works for you
     setState(() => _isLoading = true);
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -91,7 +94,24 @@ class _LoginScreenState extends State<LoginScreen> {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      await _auth.signInWithCredential(credential);
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+
+      // --- NEW LOGIC: Create user document if it's a new user ---
+      final User? user = userCredential.user;
+      if (user != null) {
+        final DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        if (!userDoc.exists) {
+          await _firestore.collection('users').doc(user.uid).set({
+            'displayName': user.displayName,
+            'email': user.email,
+            'uid': user.uid,
+            'createdAt': Timestamp.now(),
+            // age and gender will be null initially
+          });
+        }
+      }
+      // --- END OF NEW LOGIC ---
+
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -113,6 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ... (build method is the same)
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

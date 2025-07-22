@@ -1,44 +1,49 @@
-  name: tripsync
-  description: "A new Flutter project."
-  publish_to: 'none'
+name: tripsync
+description: "A new Flutter project."
+publish_to: 'none'
 
-  version: 1.0.0+1
+version: 1.0.0+1
 
-  environment:
-    sdk: '>=3.0.0 <4.0.0' # Updated for broader compatibility
+environment:
+    sdk: '>=3.0.0 <4.0.0'
 
-  dependencies:
+dependencies:
     flutter:
-      sdk: flutter
+        sdk: flutter
 
-    # Firebase
-    firebase_core: ^3.15.1
-    firebase_auth: ^5.6.2
-    cloud_firestore: ^5.6.11
-    http: ^1.2.1
+    # Firebase (Updated to compatible versions)
+    firebase_core: ^2.27.0
+    firebase_auth: ^4.17.8
+    cloud_firestore: ^4.15.8
 
-      # Google Sign In
-    google_sign_in: ^6.1.4
+    # Google Sign In
+    google_sign_in: ^6.2.1
 
     # UI/UX
-    google_fonts: ^6.2.1 # Added for custom fonts
+    google_fonts: ^6.2.1
     cupertino_icons: ^1.0.8
+    image_picker: ^1.0.7 # <-- ADD THIS LINE
+    flutter_riverpod: ^2.5.1 # <-- ADD THIS LINE
+    firebase_storage: ^11.7.5 # <-- ADD THIS LINE
 
-  dev_dependencies:
+
+
+    # Functional Packages
+    http: ^1.2.1
+    share_plus: ^9.0.0
+
+dev_dependencies:
     flutter_test:
-      sdk: flutter
+        sdk: flutter
     flutter_launcher_icons: ^0.13.1
-
     flutter_lints: ^6.0.0
 
-  flutter_icons:
+flutter_icons:
     android: true
     ios: true
     image_path: "assets/images/Tripsync_logo.png"
 
-  flutter:
+flutter:
     uses-material-design: true
-
-    # Ensure you have created this folder structure
     assets:
-      - assets/images/
+        - assets/images/

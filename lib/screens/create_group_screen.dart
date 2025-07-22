@@ -1,5 +1,6 @@
 // lib/screens/create_group_screen.dart
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,12 +16,21 @@ class CreateGroupScreen extends StatefulWidget {
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _groupNameController = TextEditingController();
+  final _locationController = TextEditingController(); // <-- NEW CONTROLLER
   final _budgetController = TextEditingController();
 
   DateTime? _startDate;
   DateTime? _endDate;
   String? _tripType;
   bool _isLoading = false;
+
+  String _generateInviteCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = Random();
+    return String.fromCharCodes(Iterable.generate(
+      6, (_) => chars.codeUnitAt(random.nextInt(chars.length)),
+    ));
+  }
 
   Future<void> _selectDate(BuildContext context, {required bool isStart}) async {
     final DateTime? picked = await showDatePicker(
@@ -49,16 +59,17 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
 
-      // Create a new document in the 'groups' collection
       await FirebaseFirestore.instance.collection('groups').add({
         'groupName': _groupNameController.text.trim(),
+        'location': _locationController.text.trim(), // <-- SAVE LOCATION
         'totalBudget': double.tryParse(_budgetController.text.trim()) ?? 0.0,
         'startDate': _startDate != null ? Timestamp.fromDate(_startDate!) : null,
         'endDate': _endDate != null ? Timestamp.fromDate(_endDate!) : null,
         'tripType': _tripType,
         'adminUid': user.uid,
-        'members': [user.uid], // Creator is the first member
+        'members': [user.uid],
         'createdAt': FieldValue.serverTimestamp(),
+        'inviteCode': _generateInviteCode(),
       });
 
       if (mounted) {
@@ -91,8 +102,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             children: [
               TextFormField(
                 controller: _groupNameController,
-                decoration: const InputDecoration(labelText: 'Group Name'),
+                decoration: const InputDecoration(labelText: 'Group Name (e.g., Goa Getaway)'),
                 validator: (value) => value!.isEmpty ? 'Please enter a group name' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField( // <-- NEW FIELD
+                controller: _locationController,
+                decoration: const InputDecoration(labelText: 'Location (e.g., Goa)'),
+                validator: (value) => value!.isEmpty ? 'Please enter a location' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
